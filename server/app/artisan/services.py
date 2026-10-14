@@ -32,6 +32,8 @@ def onboard_artisan_account(
     profile.county_id = data["county_id"]
     profile.sub_county_id = data["sub_county_id"]
     profile.specific_address = data["specific_address"]
+    profile.latitude = data.get("latitude")
+    profile.longitude = data.get("longitude")
     image_path = save_image(profile_image) if profile_image else None
     profile.profile_image = image_path
     user.role = "artisan"
@@ -81,6 +83,8 @@ def update_artisan_bio(user_id: str, data: dict) -> ArtisanProfile:
     if "bio" in data: profile.bio = data["bio"]
     if "primary_phone" in data: profile.primary_phone = data["primary_phone"]
     if "specific_address" in data: profile.specific_address = data["specific_address"]
+    if "latitude" in data: profile.latitude = data["latitude"]
+    if "longitude" in data: profile.longitude = data["longitude"]
     
     db.session.commit()
     return profile

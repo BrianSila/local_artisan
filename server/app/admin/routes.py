@@ -10,6 +10,7 @@ from app.admin.schemas import (
     SuspendUserSchema,
     VerifyArtisanData,
     VerifyArtisanSchema,
+    PendingArtisanSchema,
 )
 from app.admin.services import (
     get_admin_dashboard_stats, 
@@ -18,6 +19,7 @@ from app.admin.services import (
     process_dispute_resolution
 )
 from app.operations.models import Dispute
+from app.accounts.models import ArtisanProfile
 from app.common.pagination import paginate
 
 admin_bp = Blueprint("admin_controls", __name__)
@@ -26,6 +28,7 @@ verify_schema = VerifyArtisanSchema()
 suspend_schema = SuspendUserSchema()
 resolve_schema = ResolveDisputeSchema()
 dispute_output_schema = DisputeResponseSchema()
+pending_artisan_schema = PendingArtisanSchema(many=True)
 
 @admin_bp.route("/dashboard/stats", methods=["GET"])
 @jwt_required()
@@ -43,6 +46,14 @@ def patch_artisan_verification(profile_id):
     
     profile = toggle_artisan_verification_status(profile_id, data["is_verified"])
     return jsonify({"message": "Artisan verification updated successfully.", "profile": profile.to_dict()}), 200
+
+@admin_bp.route("/artisans/pending", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def list_pending_artisans():
+    query = ArtisanProfile.query.filter_by(is_verified=False).order_by(ArtisanProfile.id.asc())
+    paginated = paginate(query=query, schema=pending_artisan_schema)
+    return jsonify(paginated), 200
 
 @admin_bp.route("/users/<uuid:user_id>/suspend", methods=["PATCH"])
 @jwt_required()

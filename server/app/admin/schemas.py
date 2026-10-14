@@ -1,11 +1,8 @@
 from typing import Literal, TypedDict
-
 from marshmallow import Schema, fields, validate
-
 
 class VerifyArtisanData(TypedDict):
     is_verified: bool
-
 
 class SuspendUserData(TypedDict):
     is_blocked: bool
@@ -29,6 +26,27 @@ class DisputeResponseSchema(Schema):
     status = fields.Str()
     resolution_details = fields.Str(allow_none=True)
     created_at = fields.Str()
+
+class PendingArtisanSchema(Schema):
+    id = fields.Str()
+    user_id = fields.Str()
+    name = fields.Method("get_name")
+    email = fields.Method("get_email")
+    primary_phone = fields.Str()
+    bio = fields.Str(allow_none=True)
+    experience_years = fields.Int()
+    county_id = fields.Int()
+    sub_county_id = fields.Int()
+    specific_address = fields.Str()
+    latitude = fields.Float(allow_none=True)
+    longitude = fields.Float(allow_none=True)
+    profile_image = fields.Str(allow_none=True)
+
+    def get_name(self, profile):
+        return profile.user.name
+
+    def get_email(self, profile):
+        return profile.user.email
 
 class ResolveDisputeData(TypedDict):
     resolution_status: Literal["released_to_fundi", "refunded"]

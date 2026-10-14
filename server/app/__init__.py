@@ -3,9 +3,11 @@ from .config import config_by_name
 from .extensions import db, migrate, jwt, cache, cors
 
 
-def create_app(config_name="development"):
+def create_app(config_name="development", test_config=None):
     app = Flask(__name__)
     app.config.from_object(config_by_name[config_name])
+    if test_config:
+        app.config.update(test_config)
 
     # Init extensions
     db.init_app(app)
@@ -18,10 +20,10 @@ def create_app(config_name="development"):
     from app.locations.models import County
     from app.locations.models import SubCounty
     from app.accounts.models import User
-    from app.accounts.models import ArtisanProfile
+    from app.accounts.models import ArtisanProfile, SavedArtisan
     from app.services.models import Category
     from app.services.models import ArtisanService
-    from app.bookings.models import Booking
+    from app.bookings.models import AvailabilitySlot, Booking
     from app.operations.models import MpesaTransaction
     from app.operations.models import Review 
     from app.operations.models import Dispute

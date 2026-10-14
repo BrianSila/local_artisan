@@ -40,6 +40,9 @@ class ArtisanService(db.Model):
     
     artisan_id = db.Column(UUID(as_uuid=True), db.ForeignKey("artisan_profiles.id", ondelete="CASCADE"), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id", ondelete="RESTRICT"), nullable=False)
+
+    artisan_profile = db.relationship("ArtisanProfile", lazy="joined")
+    category = db.relationship("Category", lazy="joined")
     
     def to_dict(self):
         return {

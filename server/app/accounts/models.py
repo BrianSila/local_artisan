@@ -1,7 +1,7 @@
 from datetime import datetime
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import ForeignKeyConstraint
+from sqlalchemy import CheckConstraint, ForeignKeyConstraint, UniqueConstraint
 from app.extensions import db
 import bcrypt 
 
@@ -52,6 +52,19 @@ class User(db.Model):
 class ArtisanProfile(db.Model):
     __tablename__ = "artisan_profiles"
     __table_args__ = (
+        CheckConstraint(
+            "((latitude IS NULL AND longitude IS NULL) OR "
+            "(latitude IS NOT NULL AND longitude IS NOT NULL))",
+            name="ck_artisan_profiles_coordinates_pair",
+        ),
+        CheckConstraint(
+            "latitude IS NULL OR latitude BETWEEN -90 AND 90",
+            name="ck_artisan_profiles_latitude_range",
+        ),
+        CheckConstraint(
+            "longitude IS NULL OR longitude BETWEEN -180 AND 180",
+            name="ck_artisan_profiles_longitude_range",
+        ),
         ForeignKeyConstraint(
             ["county_id", "sub_county_id"],
             ["sub_counties.county_id", "sub_counties.id"],
@@ -67,10 +80,15 @@ class ArtisanProfile(db.Model):
     primary_phone = db.Column(db.String(20), nullable=False)
     profile_image = db.Column(db.String(255), nullable=True)
     is_verified = db.Column(db.Boolean, default=False, nullable=False)
-
     county_id = db.Column(db.Integer, db.ForeignKey("counties.id", ondelete="RESTRICT"), nullable=False)
     sub_county_id = db.Column(db.Integer, db.ForeignKey("sub_counties.id", ondelete="RESTRICT"), nullable=False)
     specific_address = db.Column(db.String(255), nullable=False) # e.g., "Fedha Estate gate B" 
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
+    work_photos = db.Column(db.JSON, nullable=False, default=list)
+
+    county = db.relationship("County", foreign_keys=[county_id], lazy="joined")
+    sub_county = db.relationship("SubCounty", foreign_keys=[sub_county_id], lazy="joined")
     
     def to_dict(self):
         return {
@@ -80,8 +98,32 @@ class ArtisanProfile(db.Model):
             "experience_years": self.experience_years,
             "primary_phone": self.primary_phone,
             "profile_image": self.profile_image,
-            "is_verified": self.is_verified
+            "is_verified": self.is_verified,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
         }
         
     def __repr__(self):
         return f"<Artisan {self.id}>"
+
+class SavedArtisan(db.Model):
+    __tablename__ = "saved_artisans"
+    __table_args__ = (
+        UniqueConstraint("customer_id", "artisan_id", name="uq_saved_artisan_customer_profile"),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    customer_id = db.Column(
+        UUID(as_uuid=True), db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    artisan_id = db.Column(
+        UUID(as_uuid=True),
+        db.ForeignKey("artisan_profiles.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    artisan_profile = db.relationship("ArtisanProfile", lazy="joined")
+
+    def __repr__(self):
+        return f"Saved: <{self.id}>"
