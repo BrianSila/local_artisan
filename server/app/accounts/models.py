@@ -87,8 +87,8 @@ class ArtisanProfile(db.Model):
     longitude = db.Column(db.Float, nullable=True)
     work_photos = db.Column(db.JSON, nullable=False, default=list)
 
-    county = db.relationship("County", foreign_keys=[county_id], lazy="joined")
-    sub_county = db.relationship("SubCounty", foreign_keys=[sub_county_id], lazy="joined")
+    county = db.relationship("County", foreign_keys=[county_id], lazy="select")
+    sub_county = db.relationship("SubCounty", foreign_keys=[sub_county_id], lazy="select")
     
     def to_dict(self):
         return {

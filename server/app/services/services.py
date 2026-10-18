@@ -117,6 +117,33 @@ def add_catalog_service(artisan_profile_id: UUID | str, data: Mapping[str, Any])
 	return service
 
 
+def update_catalog_service(
+    artisan_profile_id: UUID | str,
+    service_id: UUID | str,
+    data: Mapping[str, Any],
+) -> ArtisanService:
+    try:
+        artisan_uuid = UUID(str(artisan_profile_id))
+        service_uuid = UUID(str(service_id))
+    except (AttributeError, TypeError, ValueError):
+        raise NotFoundError("Service catalog item not found or unauthorized") from None
+
+    service = ArtisanService.query.filter_by(
+        id=service_uuid,
+        artisan_id=artisan_uuid,
+    ).first()
+    if service is None:
+        raise NotFoundError("Service catalog item not found or unauthorized")
+
+    service.category_id = data["category_id"]
+    service.title = data["title"]
+    service.description = data["description"]
+    service.price_type = data["price_type"]
+    service.base_price = data["base_price"]
+    db.session.commit()
+    return service
+
+
 def remove_catalog_service(artisan_profile_id: UUID | str, service_id: UUID | str) -> None:
 	try:
 		artisan_uuid = UUID(str(artisan_profile_id))

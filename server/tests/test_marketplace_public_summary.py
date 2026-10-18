@@ -157,6 +157,58 @@ class MarketplacePublicSummaryTests(unittest.TestCase):
         profile_response = self.client.get("/api/artisan/profile", headers=headers)
         self.assertEqual(len(profile_response.get_json()["profile"]["work_photos"]), 1)
 
+    def test_artisan_can_update_only_their_own_service(self):
+        headers = self._auth_headers(self.artisan_user_id, "artisan")
+        response = self.client.put(
+            f"/api/artisan/services/{self.service_id}",
+            json={
+                "category_id": 1,
+                "title": "Updated wiring repair",
+                "description": "Updated diagnosis and repair for household wiring.",
+                "price_type": "hourly",
+                "base_price": 3200,
+            },
+            headers=headers,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["service"]["title"], "Updated wiring repair")
+        self.assertEqual(response.get_json()["service"]["price_type"], "hourly")
+
+        listing_response = self.client.get(f"/api/marketplace/listings/{self.service_id}")
+        self.assertEqual(listing_response.get_json()["title"], "Updated wiring repair")
+        self.assertEqual(listing_response.get_json()["base_price"], 3200)
+
+        other_user = User(
+            name="Another Artisan",
+            email="another-artisan@example.test",
+            password_hash="hash",
+            role="artisan",
+        )
+        other_profile = ArtisanProfile(
+            user=other_user,
+            bio="A different artisan with a separate catalog.",
+            experience_years=4,
+            primary_phone="254700000002",
+            county=County.query.first(),
+            sub_county=SubCounty.query.first(),
+            specific_address="Kilimani",
+        )
+        db.session.add(other_user)
+        db.session.commit()
+        unauthorized = self.client.put(
+            f"/api/artisan/services/{self.service_id}",
+            json={
+                "category_id": 1,
+                "title": "Attempted unauthorized edit",
+                "description": "This update must not change another artisan's service.",
+                "price_type": "fixed",
+                "base_price": 100,
+            },
+            headers=self._auth_headers(other_user.id, "artisan"),
+        )
+        self.assertEqual(unauthorized.status_code, 404)
+
     def test_public_artisan_profile_hides_unverified_artisans(self):
         profile = db.session.get(ArtisanProfile, self.artisan_id)
         profile.is_verified = False

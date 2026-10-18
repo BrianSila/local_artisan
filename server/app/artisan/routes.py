@@ -20,7 +20,11 @@ from app.artisan.services import (
     update_artisan_bio,
     update_artisan_profile_image,
 )
-from app.services.services import add_catalog_service, remove_catalog_service
+from app.services.services import (
+    add_catalog_service,
+    remove_catalog_service,
+    update_catalog_service,
+)
 from app.common.decorators import login_required, role_required
 from app.common.errors import NotFoundError
 from app.common.errors import APIError
@@ -225,3 +229,19 @@ def delete_service(service_id):
     
     remove_catalog_service(user.artisan_profile.id, service_id)
     return jsonify({"message": "Service successfully removed from catalog"}), 200
+
+
+@artisan_bp.route("/services/<uuid:service_id>", methods=["PUT"])
+@jwt_required()
+@role_required("artisan")
+def update_service(service_id):
+    json_data = request.get_json() or {}
+    data = cast(dict, catalog_schema.load(json_data))
+
+    current_user_id = get_jwt_identity()
+    user = db.session.get(User, UUID(str(current_user_id)))
+    if user is None or user.artisan_profile is None:
+        raise NotFoundError("Artisan profile not found")
+
+    service = update_catalog_service(user.artisan_profile.id, service_id, data)
+    return jsonify({"message": "Service updated successfully", "service": service.to_dict()}), 200
