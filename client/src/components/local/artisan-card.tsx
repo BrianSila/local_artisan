@@ -9,9 +9,11 @@ import { CategoryIcon } from "./shared";
 export function ArtisanCard({
   service,
   category,
+  showProfileLink = true,
 }: {
   service: Service;
   category: Category | undefined;
+  showProfileLink?: boolean;
 }) {
   const { user } = useAuth();
   const [busy, setBusy] = useState(false);
@@ -56,13 +58,15 @@ export function ArtisanCard({
         )}
         <div className="artisan-card-identity">
           <p className="artisan-card-name">{service.artisan_name || "Local artisan"}</p>
-          <Link
-            className="artisan-card-profile-link"
-            to="/artisans/$id"
-            params={{ id: service.artisan_id }}
-          >
-            View profile
-          </Link>
+          {showProfileLink && (
+            <Link
+              className="artisan-card-profile-link"
+              to="/artisans/$id"
+              params={{ id: service.artisan_id }}
+            >
+              View profile
+            </Link>
+          )}
           <h2 title={service.title}>{service.title}</h2>
           {service.is_verified !== undefined && (
             <span

@@ -98,7 +98,7 @@ export function AccountPage() {
             : "Your next project, and the people who can make it happen."}
       </p>
       <RoleDashboard role={user.role} />
-      <section className="form-section max-w-xl">
+      <section className="form-section max-w-2xl">
         <h2>Your details</h2>
         <form className="form-stack" onSubmit={submit}>
           <label>

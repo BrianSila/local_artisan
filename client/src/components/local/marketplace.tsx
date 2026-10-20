@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowRight, ArrowLeft, LocateFixed, Search, MessageCircle } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowLeft,
+  LocateFixed,
+  Search,
+  MessageCircle,
+  CalendarCheck,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   api,
@@ -38,6 +45,7 @@ export function BrowsePage({ filters }: { filters: BrowseSearch }) {
   const [term, setTerm] = useState(filters.search_term || "");
   const [radiusDraft, setRadiusDraft] = useState(String(filters.radius_km || 10));
   const [geoError, setGeoError] = useState("");
+  const [geoBusy, setGeoBusy] = useState(false);
   const categories = useCategories();
   const page = filters.page || 1;
   useEffect(() => {
@@ -109,35 +117,42 @@ export function BrowsePage({ filters }: { filters: BrowseSearch }) {
             onSubcounty={(v) => update({ sub_county_id: v })}
           />
         </div>
-        <div className="form-actions">
+        <div className="form-actions filter-actions">
           <Button type="submit">
             <Search /> Search services
           </Button>
           <Button
             type="button"
             variant="outline"
+            disabled={geoBusy}
             onClick={() => {
               setGeoError("");
               if (!navigator.geolocation) {
                 setGeoError("Nearby search is unavailable. Choose a county instead.");
                 return;
               }
+              setGeoBusy(true);
               navigator.geolocation.getCurrentPosition(
-                (pos) =>
+                (pos) => {
+                  setGeoBusy(false);
                   update({
                     latitude: pos.coords.latitude,
                     longitude: pos.coords.longitude,
                     radius_km: 10,
-                  }),
-                () => setGeoError("We couldn’t access your location. Choose a county instead."),
+                  });
+                },
+                () => {
+                  setGeoBusy(false);
+                  setGeoError("We couldn’t access your location. Choose a county instead.");
+                },
               );
             }}
           >
-            <LocateFixed /> Search nearby
+            <LocateFixed /> {geoBusy ? "Finding you…" : "Search nearby"}
           </Button>
           {filters.latitude !== undefined && (
             <>
-              <label>
+              <label className="radius-label">
                 Radius (km)
                 <input
                   type="number"
@@ -166,11 +181,11 @@ export function BrowsePage({ filters }: { filters: BrowseSearch }) {
         </p>
       )}
       {categories.error && (
-        <div className="mt-5">
+        <div className="marketplace-category-error">
           <ErrorNotice error={categories.error} retry={() => categories.refetch()} />
         </div>
       )}
-      <div className="mt-8">
+      <div className="marketplace-results">
         {results.isLoading ? (
           <Loading />
         ) : results.error ? (
@@ -186,7 +201,7 @@ export function BrowsePage({ filters }: { filters: BrowseSearch }) {
                 })}
               </div>
             ) : (
-              <Empty title="No services found">
+              <Empty title="No services found" icon={Search}>
                 Try a different search or widen your location.
               </Empty>
             )}
@@ -304,14 +319,14 @@ export function ListingPage({ id }: { id: string }) {
                 {service.artisan_name || "View artisan profile"}
               </Link>
               {service.review_count !== undefined && (
-                <p className="form-hint mt-2">
+                <p className="form-hint listing-meta">
                   {service.review_count > 0 && service.average_rating !== null
                     ? `${service.average_rating?.toFixed(1)} from ${service.review_count} reviews`
                     : "No reviews yet"}
                 </p>
               )}
               <div className="price-large">{price(service)}</div>
-              <h2 className="text-xl mt-9 mb-4">About this service</h2>
+              <h2 className="detail-section-heading">About this service</h2>
               <p className="service-description">{service.description}</p>
             </section>
             <aside className="booking-panel">
@@ -379,7 +394,7 @@ export function ListingPage({ id }: { id: string }) {
                         type="submit"
                       >
                         {busy ? "Sending request…" : "Request a booking"}
-                        <CalendarIcon />
+                        <CalendarCheck size={16} />
                       </Button>
                     </form>
                   )}
@@ -394,7 +409,7 @@ export function ListingPage({ id }: { id: string }) {
                       />
                     </label>
                     <Button
-                      className="mt-4"
+                      className="listing-contact-button"
                       variant="outline"
                       disabled={contactBusy}
                       onClick={contact}
@@ -405,14 +420,14 @@ export function ListingPage({ id }: { id: string }) {
                 </>
               )}
               {error && (
-                <p className="inline-error mt-4" role="alert">
+                <p className="inline-error listing-feedback" role="alert">
                   {error}
                 </p>
               )}
               {success && (
-                <div className="success-notice mt-4" role="status">
+                <div className="success-notice listing-feedback" role="status">
                   {success}
-                  <Link className="text-link mt-3" to="/bookings">
+                  <Link className="text-link listing-bookings-link" to="/bookings">
                     View my bookings <ArrowRight size={14} />
                   </Link>
                 </div>
@@ -423,7 +438,4 @@ export function ListingPage({ id }: { id: string }) {
       )}
     </main>
   );
-}
-function CalendarIcon() {
-  return <ArrowRight />;
 }

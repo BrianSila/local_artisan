@@ -70,9 +70,11 @@ export function HomePage() {
               <select
                 aria-label="Select county"
                 value={county}
+                disabled={counties.isLoading}
+                aria-busy={counties.isLoading}
                 onChange={(e) => setCounty(e.target.value)}
               >
-                <option value="">Anywhere</option>
+                <option value="">{counties.isLoading ? "Loading counties…" : "Anywhere"}</option>
                 {counties.data?.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -84,6 +86,14 @@ export function HomePage() {
               Find a service <ArrowRight />
             </Button>
           </form>
+          {counties.error && (
+            <div className="hero-search-error" role="alert">
+              <span>County filters are unavailable right now. You can still search anywhere.</span>
+              <Button type="button" variant="ghost" size="sm" onClick={() => counties.refetch()}>
+                Try again
+              </Button>
+            </div>
+          )}
           <div className="popular-searches">
             <span>A little inspiration:</span>
             <Link to="/browse" search={{ search_term: "Plumbing" }}>

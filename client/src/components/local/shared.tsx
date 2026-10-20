@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -36,12 +36,43 @@ export function Brand() {
 }
 export function Header() {
   const [open, setOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const { user, logout } = useAuth();
+
+  useEffect(() => {
+    if (!open) return;
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    }
+
+    function closeOnOutsidePointer(event: PointerEvent) {
+      if (event.target instanceof Node && !headerRef.current?.contains(event.target)) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener("keydown", closeOnEscape);
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    return () => {
+      document.removeEventListener("keydown", closeOnEscape);
+      document.removeEventListener("pointerdown", closeOnOutsidePointer);
+    };
+  }, [open]);
+
   return (
-    <header className="site-header">
+    <header ref={headerRef} className="site-header">
       <div className="container header-inner">
         <Brand />
-        <nav className={open ? "main-nav nav-open" : "main-nav"} aria-label="Main navigation">
+        <nav
+          id="main-navigation"
+          className={open ? "main-nav nav-open" : "main-nav"}
+          aria-label="Main navigation"
+        >
           <Link to="/" activeProps={{ className: "nav-active" }} onClick={() => setOpen(false)}>
             Home
           </Link>
@@ -59,6 +90,48 @@ export function Header() {
           >
             About us
           </Link>
+          <div className="mobile-nav-auth">
+            {user ? (
+              <>
+                <Link
+                  to="/workspace"
+                  activeProps={{ className: "nav-active" }}
+                  onClick={() => setOpen(false)}
+                >
+                  My account
+                </Link>
+                <button
+                  type="button"
+                  className="mobile-nav-logout"
+                  onClick={() => {
+                    setOpen(false);
+                    logout();
+                  }}
+                >
+                  <LogOut size={16} /> Sign out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/auth"
+                  search={{ mode: "login" }}
+                  activeProps={{ className: "nav-active" }}
+                  onClick={() => setOpen(false)}
+                >
+                  Log in
+                </Link>
+                <Link
+                  to="/auth"
+                  search={{ mode: "register", role: "artisan" }}
+                  activeProps={{ className: "nav-active" }}
+                  onClick={() => setOpen(false)}
+                >
+                  Join as an artisan
+                </Link>
+              </>
+            )}
+          </div>
         </nav>
         <div className="header-actions">
           {user ? (
@@ -95,6 +168,9 @@ export function Header() {
             size="icon"
             className="menu-toggle"
             aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            aria-controls="main-navigation"
+            ref={menuButtonRef}
             onClick={() => setOpen(!open)}
           >
             {open ? <X /> : <Menu />}
@@ -183,10 +259,18 @@ export function ErrorNotice({ error, retry }: { error: unknown; retry?: () => vo
     </div>
   );
 }
-export function Empty({ title, children }: { title: string; children?: ReactNode }) {
+export function Empty({
+  title,
+  children,
+  icon: Icon = Wrench,
+}: {
+  title: string;
+  children?: ReactNode;
+  icon?: React.ComponentType<{ size?: number; className?: string }>;
+}) {
   return (
     <div className="empty-state">
-      <Wrench size={30} />
+      <Icon size={30} />
       <h3>{title}</h3>
       {children && <p>{children}</p>}
     </div>

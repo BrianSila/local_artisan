@@ -137,13 +137,13 @@ export function OnboardingPage() {
           : "Introduce yourself and tell your community where to find you."}
       </p>
       {editing && (
-        <p className="form-hint mb-5">
+        <p className="form-hint artisan-profile-meta">
           {profile.experience_years ?? 0} years of experience ·{" "}
           {profile.county_name || "Location pending"}
           {profile.sub_county_name ? `, ${profile.sub_county_name}` : ""}
         </p>
       )}
-      <form key={editing ? "edit" : "setup"} className="form-stack max-w-2xl" onSubmit={submit}>
+      <form key={editing ? "edit" : "setup"} className="artisan-form form-stack" onSubmit={submit}>
         <label>
           About you
           <textarea
@@ -248,7 +248,7 @@ export function OnboardingPage() {
         {success && (
           <div className="success-notice" role="status">
             {success}
-            <Link className="text-link mt-2" to="/services">
+            <Link className="text-link onboarding-services-link" to="/services">
               Manage my services <ArrowRight size={15} />
             </Link>
           </div>
@@ -258,7 +258,7 @@ export function OnboardingPage() {
         </Button>
       </form>
       {editing && (
-        <form className="form-section form-stack max-w-2xl" onSubmit={upload}>
+        <form className="artisan-form form-section form-stack" onSubmit={upload}>
           <h2>Your profile photo</h2>
           <label>
             Choose a photo (up to 5 MB)
@@ -453,7 +453,7 @@ export function ServicesPage() {
       ) : (
         <Empty title="Your catalog starts here">Add your first service below.</Empty>
       )}
-      <section className="form-section max-w-2xl mt-6">
+      <section className="artisan-form form-section artisan-form-section">
         <h2>Appointment availability</h2>
         <p className="form-hint">Times are entered and displayed in Nairobi time (EAT).</p>
         {availability.isLoading ? (
@@ -486,7 +486,7 @@ export function ServicesPage() {
         ) : (
           <p className="form-hint">No appointment times published yet.</p>
         )}
-        <form className="form-stack mt-5" onSubmit={addAvailability}>
+        <form className="form-stack availability-form" onSubmit={addAvailability}>
           <div className="form-grid">
             <label>
               Starts at (Nairobi time)
@@ -512,7 +512,11 @@ export function ServicesPage() {
           </Button>
         </form>
       </section>
-      <section className="form-section max-w-2xl mt-6" id="service-editor" ref={serviceEditorRef}>
+      <section
+        className="artisan-form form-section artisan-form-section"
+        id="service-editor"
+        ref={serviceEditorRef}
+      >
         <h2>{editing ? `Edit ${editing.title}` : "Add a service"}</h2>
         <form key={editing?.id || "new-service"} className="form-stack" onSubmit={saveService}>
           <label>

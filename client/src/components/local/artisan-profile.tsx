@@ -53,7 +53,7 @@ export function ArtisanProfilePage({ id }: { id: string }) {
           <ProfileHeader artisan={profile.data} />
           {profile.data.work_photos.length > 0 && (
             <section aria-labelledby="work-photos-heading">
-              <h2 className="text-xl mt-9 mb-4" id="work-photos-heading">
+              <h2 className="profile-section-heading" id="work-photos-heading">
                 Work photos
               </h2>
               <div className="public-work-gallery">
@@ -68,13 +68,18 @@ export function ArtisanProfilePage({ id }: { id: string }) {
             </section>
           )}
           <section aria-labelledby="services-heading">
-            <h2 className="text-xl mt-9 mb-4" id="services-heading">
+            <h2 className="profile-section-heading" id="services-heading">
               Services
             </h2>
             {profile.data.services.length ? (
               <div className="public-artisan-services-grid">
                 {profile.data.services.map((service) => (
-                  <ArtisanCard key={service.id} service={service} category={undefined} />
+                  <ArtisanCard
+                    key={service.id}
+                    service={service}
+                    category={undefined}
+                    showProfileLink={false}
+                  />
                 ))}
               </div>
             ) : (
@@ -82,7 +87,7 @@ export function ArtisanProfilePage({ id }: { id: string }) {
             )}
           </section>
           <section aria-labelledby="reviews-heading">
-            <h2 className="text-xl mt-9 mb-4" id="reviews-heading">
+            <h2 className="profile-section-heading" id="reviews-heading">
               Reviews ({profile.data.review_count})
             </h2>
             {reviews.isLoading ? (
@@ -134,7 +139,7 @@ function ProfileHeader({ artisan }: { artisan: PublicArtisanProfile }) {
           <UserRound size={32} />
         </span>
       )}
-      <div>
+      <div className="public-artisan-identity">
         <div className="section-label">ARTISAN PROFILE</div>
         <h1 className="page-title">{artisan.name}</h1>
         <p className="public-artisan-location">
@@ -158,7 +163,9 @@ function ProfileHeader({ artisan }: { artisan: PublicArtisanProfile }) {
           <span>{artisan.completed_job_count} completed jobs</span>
         </div>
       </div>
-      <SaveArtisanButton artisan={artisan} redirectTo={`/artisans/${artisan.id}`} />
+      <div className="public-artisan-action">
+        <SaveArtisanButton artisan={artisan} redirectTo={`/artisans/${artisan.id}`} />
+      </div>
       {artisan.bio && <p className="public-artisan-bio">{artisan.bio}</p>}
     </header>
   );

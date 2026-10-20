@@ -68,7 +68,7 @@ export function AuthPage({ search }: { search: AuthSearch }) {
     }
   }
   return (
-    <main className="container page-main">
+    <main className="container page-main auth-page-main">
       <div className="auth-layout">
         <div className="section-label">WELCOME TO LOCAL ARTISAN</div>
         <h1 className="page-title">
@@ -87,10 +87,12 @@ export function AuthPage({ search }: { search: AuthSearch }) {
           </>
         ) : (
           <>
-            <div className="segmented">
+            <div className="segmented auth-tabs" role="tablist" aria-label="Authentication mode">
               <Button
                 variant="ghost"
                 className={mode === "login" ? "selected" : ""}
+                role="tab"
+                aria-selected={mode === "login"}
                 onClick={() => {
                   setMode("login");
                   setError("");
@@ -101,6 +103,8 @@ export function AuthPage({ search }: { search: AuthSearch }) {
               <Button
                 variant="ghost"
                 className={mode === "register" ? "selected" : ""}
+                role="tab"
+                aria-selected={mode === "register"}
                 onClick={() => {
                   setMode("register");
                   setError("");
@@ -110,7 +114,7 @@ export function AuthPage({ search }: { search: AuthSearch }) {
               </Button>
             </div>
             {success && (
-              <div className="success-notice mb-5" role="status">
+              <div className="success-notice auth-success" role="status">
                 {success}
               </div>
             )}

@@ -174,8 +174,8 @@ export function BookingsPage() {
           if (!open && !busy) setAction(null);
         }}
       >
-        <DialogContent>
-          <DialogTitle>
+        <DialogContent className="booking-action-dialog">
+          <DialogTitle className="booking-action-title">
             {action?.kind === "checkout"
               ? "Simulated M-Pesa request"
               : action?.kind === "review"
@@ -184,7 +184,7 @@ export function BookingsPage() {
                   ? "Raise a dispute"
                   : `Confirm: ${action?.status}`}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="booking-action-description">
             Booking #{action?.booking.id}
             {action?.kind === "checkout"
               ? " · This is a simulated payment request, not a real transaction."
@@ -192,7 +192,7 @@ export function BookingsPage() {
                 ? " · Filing a dispute freezes escrow tracking. The service will check whether this booking is eligible."
                 : " · The service will check whether this action is allowed."}
           </DialogDescription>
-          <form className="form-stack mt-3" onSubmit={submit}>
+          <form className="booking-action-form form-stack" onSubmit={submit}>
             {!success && (
               <>
                 {action?.kind === "checkout" && (
@@ -237,7 +237,7 @@ export function BookingsPage() {
                     {error}
                   </p>
                 )}
-                <div className="form-actions">
+                <div className="booking-action-actions form-actions">
                   <Button type="submit" disabled={busy}>
                     {busy ? "Submitting…" : "Confirm and submit"}
                   </Button>
@@ -257,7 +257,11 @@ export function BookingsPage() {
                 <div className="success-notice" role="status">
                   {success}
                 </div>
-                <Button type="button" onClick={() => setAction(null)}>
+                <Button
+                  className="booking-action-done"
+                  type="button"
+                  onClick={() => setAction(null)}
+                >
                   Done
                 </Button>
               </>

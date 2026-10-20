@@ -85,7 +85,7 @@ describe("Admin record summaries", () => {
     });
 
     renderAdmin();
-    fireEvent.click(screen.getByRole("button", { name: "Open disputes" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Open disputes" }));
 
     expect(await screen.findByRole("heading", { name: "Dispute #7" })).toBeInTheDocument();
     expect(screen.getByText("Open")).toBeInTheDocument();

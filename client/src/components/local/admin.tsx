@@ -146,12 +146,14 @@ export function AdminPage() {
           </div>
         )
       )}
-      <div className="segmented">
+      <div className="segmented admin-tabs" role="tablist" aria-label="Administration sections">
         {(["artisans", "disputes", "users"] as const).map((t) => (
           <Button
             key={t}
             variant="ghost"
             className={t === tab ? "selected" : ""}
+            role="tab"
+            aria-selected={t === tab}
             onClick={() => {
               setTab(t);
               setPage(1);
@@ -307,8 +309,8 @@ export function AdminPage() {
           if (!open && !busy) setChange(null);
         }}
       >
-        <DialogContent>
-          <DialogTitle>
+        <DialogContent className="admin-action-dialog">
+          <DialogTitle className="admin-action-title">
             {change?.kind === "verify"
               ? "Verify artisan"
               : change?.kind === "suspend"
@@ -319,10 +321,10 @@ export function AdminPage() {
                   ? "Change account role"
                   : "Resolve dispute"}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="admin-action-description">
             {change?.name} · Confirm this change before continuing.
           </DialogDescription>
-          <form className="form-stack" onSubmit={submit}>
+          <form className="admin-action-form form-stack" onSubmit={submit}>
             {!success && (
               <>
                 {change?.kind === "role" && (
@@ -360,7 +362,7 @@ export function AdminPage() {
                     {error}
                   </p>
                 )}
-                <div className="form-actions">
+                <div className="admin-action-actions form-actions">
                   <Button disabled={busy} type="submit">
                     {busy ? "Saving…" : "Confirm change"}
                   </Button>
@@ -380,7 +382,7 @@ export function AdminPage() {
                 <p className="success-notice" role="status">
                   {success}
                 </p>
-                <Button type="button" onClick={() => setChange(null)}>
+                <Button className="admin-action-done" type="button" onClick={() => setChange(null)}>
                   Done
                 </Button>
               </>

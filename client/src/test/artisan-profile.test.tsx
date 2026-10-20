@@ -106,6 +106,7 @@ describe("Public artisan profile and saved artisans", () => {
     renderWithQueryClient(<ArtisanProfilePage id={artisan.id} />);
 
     expect(await screen.findByRole("heading", { name: artisan.name })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "View profile" })).not.toBeInTheDocument();
     expect(screen.getByText(artisan.bio)).toBeInTheDocument();
     expect(await screen.findByText("Excellent work.")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
