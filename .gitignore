@@ -1,3 +1,12 @@
+.lovable/
+.gpteng/
+.bolt/
+.cursor/
+.copilot/
+.cline/
+.roo/
+agents.md
+
 # OS / editor files
 .DS_Store
 Thumbs.db
@@ -34,7 +43,7 @@ ENV/
 **/.env.*
 !**/.env.example
 
-# Node / Vite
+# Node / Vite / Bun
 node_modules/
 **/node_modules/
 dist/
@@ -49,6 +58,14 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+bun.lockb
+bun.lock
+bunfig.toml
+
+# Code Quality & Formatters
+.prettiercache
+.eslintcache
+.prettierrc
 
 # Project generated output
 client/dist/
@@ -71,6 +88,10 @@ server/venv/
 server/env/
 server/ENV/
 
-# Keep migration files tracked by default
-# The repository intentionally includes versioned migrations.
+# Migrations
 !server/migrations/versions/.gitkeep
+
+# Framework Specific Outputs
+.output/
+.tanstack/tmp/
+.wrangler/deploy
