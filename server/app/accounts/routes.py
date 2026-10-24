@@ -1,6 +1,7 @@
 from typing import cast
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import get_jwt_identity, jwt_required, create_access_token
+from sqlalchemy import or_
 from .schemas import (
     LoginUserData,
     LoginUserSchema,
@@ -107,7 +108,21 @@ def handle_deactivation():
 @jwt_required()
 @role_required("admin")  
 def get_all_users():
-    query = User.query.order_by(User.created_at.desc())
+    query = User.query
+    search = request.args.get("q", "", type=str).strip()
+    if search:
+        term = f"%{search}%"
+        query = query.filter(or_(User.name.ilike(term), User.email.ilike(term), User.phone.ilike(term)))
+    role = request.args.get("role", "", type=str).strip()
+    if role in {"customer", "artisan", "admin"}:
+        query = query.filter(User.role == role)
+    status = request.args.get("status", "", type=str).strip()
+    if status == "active":
+        query = query.filter(User.is_blocked.is_(False))
+    elif status == "suspended":
+        query = query.filter(User.is_blocked.is_(True))
+    sort = request.args.get("sort", "default", type=str)
+    query = query.order_by(User.name.asc() if sort == "name_asc" else User.created_at.desc())
     
     paginated_users = paginate(query=query, schema=user_summary_schema)
     return jsonify(paginated_users), 200

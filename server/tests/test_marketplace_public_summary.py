@@ -324,6 +324,15 @@ class MarketplacePublicSummaryTests(unittest.TestCase):
             )
             for index in range(2)
         ]
+        bookings.append(
+            Booking(
+                customer_id=customer_id,
+                artisan_id=self.artisan_id,
+                service_id=UUID(self.service_id),
+                scheduled_date=datetime.utcnow() + timedelta(days=1),
+                status="pending",
+            )
+        )
         db.session.add_all(bookings)
         db.session.flush()
         db.session.add_all([

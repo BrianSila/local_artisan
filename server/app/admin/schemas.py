@@ -1,5 +1,6 @@
 from typing import Literal, TypedDict
 from marshmallow import Schema, fields, validate
+from flask import url_for
 
 class VerifyArtisanData(TypedDict):
     is_verified: bool
@@ -41,12 +42,16 @@ class PendingArtisanSchema(Schema):
     latitude = fields.Float(allow_none=True)
     longitude = fields.Float(allow_none=True)
     profile_image = fields.Str(allow_none=True)
+    profile_image_url = fields.Method("get_profile_image_url", allow_none=True)
 
     def get_name(self, profile):
         return profile.user.name
 
     def get_email(self, profile):
         return profile.user.email
+
+    def get_profile_image_url(self, profile):
+        return url_for("static", filename=profile.profile_image, _external=True) if profile.profile_image else None
 
 class ResolveDisputeData(TypedDict):
     resolution_status: Literal["released_to_fundi", "refunded"]

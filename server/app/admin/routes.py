@@ -1,6 +1,7 @@
 from typing import cast
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
+from sqlalchemy import or_
 from app.common.decorators import login_required, role_required
 from app.admin.schemas import (
     DisputeResponseSchema,
@@ -19,7 +20,7 @@ from app.admin.services import (
     process_dispute_resolution
 )
 from app.operations.models import Dispute
-from app.accounts.models import ArtisanProfile
+from app.accounts.models import ArtisanProfile, User
 from app.common.pagination import paginate
 
 admin_bp = Blueprint("admin_controls", __name__)
@@ -51,7 +52,27 @@ def patch_artisan_verification(profile_id):
 @jwt_required()
 @role_required("admin")
 def list_pending_artisans():
-    query = ArtisanProfile.query.filter_by(is_verified=False).order_by(ArtisanProfile.id.asc())
+    query = ArtisanProfile.query.join(User).filter(ArtisanProfile.is_verified.is_(False))
+    search = request.args.get("q", "", type=str).strip()
+    if search:
+        term = f"%{search}%"
+        query = query.filter(
+            or_(
+                User.name.ilike(term),
+                User.email.ilike(term),
+                User.phone.ilike(term),
+                ArtisanProfile.primary_phone.ilike(term),
+                ArtisanProfile.specific_address.ilike(term),
+            )
+        )
+    sort = request.args.get("sort", "default", type=str)
+    query = query.order_by(
+        ArtisanProfile.experience_years.desc()
+        if sort == "experience_desc"
+        else User.name.asc()
+        if sort == "name_asc"
+        else ArtisanProfile.id.asc()
+    )
     paginated = paginate(query=query, schema=pending_artisan_schema)
     return jsonify(paginated), 200
 
@@ -69,7 +90,12 @@ def patch_user_suspension(user_id):
 @jwt_required()
 @role_required("admin")
 def list_platform_disputes():
-    query = Dispute.query.filter_by(status="open").order_by(Dispute.created_at.asc())
+    query = Dispute.query.filter_by(status="open")
+    search = request.args.get("q", "", type=str).strip()
+    if search:
+        query = query.filter(Dispute.reason.ilike(f"%{search}%"))
+    sort = request.args.get("sort", "default", type=str)
+    query = query.order_by(Dispute.created_at.desc() if sort == "created_desc" else Dispute.created_at.asc())
     
     paginated_disputes = paginate(query=query, schema=dispute_output_schema)
     return jsonify(paginated_disputes), 200

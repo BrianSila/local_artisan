@@ -6,6 +6,7 @@ from app.accounts.models import ArtisanProfile, User
 from app.common.errors import NotFoundError, ValidationError
 from app.common.uploads import delete_image, save_image
 from app.artisan.schemas import OnboardArtisanData
+from app.locations.models import SubCounty
 
 
 def onboard_artisan_account(
@@ -81,8 +82,17 @@ def update_artisan_bio(user_id: str, data: dict) -> ArtisanProfile:
         
     profile = user.artisan_profile
     if "bio" in data: profile.bio = data["bio"]
+    if "experience_years" in data: profile.experience_years = data["experience_years"]
     if "primary_phone" in data: profile.primary_phone = data["primary_phone"]
     if "specific_address" in data: profile.specific_address = data["specific_address"]
+    if "county_id" in data or "sub_county_id" in data:
+        county_id = data.get("county_id", profile.county_id)
+        sub_county_id = data.get("sub_county_id", profile.sub_county_id)
+        sub_county = SubCounty.query.filter_by(id=sub_county_id, county_id=county_id).first()
+        if sub_county is None:
+            raise ValidationError("The selected subcounty does not belong to the selected county")
+        profile.county_id = county_id
+        profile.sub_county_id = sub_county_id
     if "latitude" in data: profile.latitude = data["latitude"]
     if "longitude" in data: profile.longitude = data["longitude"]
     

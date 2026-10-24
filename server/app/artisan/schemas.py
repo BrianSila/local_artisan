@@ -39,8 +39,11 @@ class OnboardArtisanSchema(Schema):
 
 class ArtisanProfileUpdateSchema(Schema):
     bio = fields.Str(validate=validate.Length(min=10, max=1000))
+    experience_years = fields.Int(validate=validate.Range(min=0, max=50))
     primary_phone = fields.Str(validate=validate.Length(min=10, max=15))
     specific_address = fields.Str(validate=validate.Length(min=2, max=255))
+    county_id = fields.Int()
+    sub_county_id = fields.Int()
     latitude = fields.Float(allow_none=True, validate=validate.Range(min=-90, max=90))
     longitude = fields.Float(allow_none=True, validate=validate.Range(min=-180, max=180))
 

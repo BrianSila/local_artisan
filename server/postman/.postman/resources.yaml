@@ -1,9 +1,0 @@
-# Use this workspace to collaborate
-workspace:
-  id: ""
-
-localResources:
-  collections:
-    - ../Local Artisan API.postman_collection.json
-  environments:
-    - ../Local Artisan API.postman_environment.json
