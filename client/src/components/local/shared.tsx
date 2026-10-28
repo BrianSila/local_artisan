@@ -17,6 +17,8 @@ import {
   X,
   MapPin,
   LogOut,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api, type Category, type Location } from "@/lib/local/api";
@@ -36,9 +38,34 @@ export function Brand() {
 }
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const { user, logout } = useAuth();
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("local_artisan_theme") as "dark" | "light" | null;
+      const initial = saved === "light" ? "light" : "dark";
+      setTheme(initial);
+      document.documentElement.classList.toggle("dark", initial === "dark");
+      document.documentElement.classList.toggle("light", initial === "light");
+    } catch {
+      // ignore storage errors
+    }
+  }, []);
+
+  function toggleTheme() {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    document.documentElement.classList.toggle("dark", next === "dark");
+    document.documentElement.classList.toggle("light", next === "light");
+    try {
+      localStorage.setItem("local_artisan_theme", next);
+    } catch {
+      // ignore storage errors
+    }
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -163,6 +190,16 @@ export function Header() {
               </Button>
             </>
           )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="theme-toggle"
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            title={theme === "dark" ? "Switch to light tech mode" : "Switch to dark tech mode"}
+            onClick={toggleTheme}
+          >
+            {theme === "dark" ? <Sun /> : <Moon />}
+          </Button>
           <Button
             variant="ghost"
             size="icon"
