@@ -8,9 +8,12 @@ import {
   Search,
   MessageCircle,
   CalendarCheck,
+  Sparkles,
+  Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { techAudio } from "@/lib/artisan-chat-engine";
 import {
   api,
   nairobiDate,
@@ -444,22 +447,56 @@ export function ListingPage({ id }: { id: string }) {
                   )}
                   <div className="form-section">
                     <label>
-                      Message (optional)
+                      <span className="flex items-center justify-between">
+                        <span>Message to Artisan (optional)</span>
+                        <span className="text-[11px] font-mono opacity-60">{message.length}/1000</span>
+                      </span>
                       <textarea
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         maxLength={1000}
-                        placeholder="What would you like to discuss?"
+                        placeholder="What would you like to discuss? (e.g. site visit, quotation, emergency)..."
                       />
                     </label>
-                    <Button
-                      className="listing-contact-button"
-                      variant="outline"
+
+                    {/* Modern Tech Quick Inquiry Chips */}
+                    <div className="flex flex-wrap gap-1.5 mb-2.5">
+                      {[
+                        "Are you available for an urgent job?",
+                        "Could you send an estimated quote?",
+                        "Can we arrange an on-site visit?",
+                      ].map((prompt, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          className="text-[11.5px] px-2.5 py-1 rounded-md bg-secondary border border-border/80 hover:border-primary/50 text-foreground transition-all cursor-pointer text-left"
+                          onClick={() => {
+                            techAudio.playClickBlip();
+                            setMessage(prompt);
+                          }}
+                        >
+                          <Sparkles className="size-2.5 inline mr-1 text-primary" />
+                          {prompt}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      className="tech-artisan-chat-btn w-full justify-center !py-2.5 !text-sm"
                       disabled={contactBusy}
-                      onClick={contact}
+                      onClick={() => {
+                        techAudio.playClickBlip();
+                        contact();
+                      }}
                     >
-                      <MessageCircle /> {contactBusy ? "Getting contact…" : "Contact on WhatsApp"}
-                    </Button>
+                      <span className="tech-artisan-chat-btn-pulse" />
+                      <MessageCircle className="size-4" />
+                      <span>{contactBusy ? "Opening Secure WhatsApp..." : "Start Chat on WhatsApp"}</span>
+                    </button>
+                    <p className="text-[11px] text-muted-foreground flex items-center justify-center gap-1.5 mt-2 font-mono">
+                      <Lock className="size-3 text-primary" /> 256-bit encrypted WhatsApp link
+                    </p>
                   </div>
                 </>
               )}

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { api, price, type Category, type Service } from "@/lib/local/api";
 import { useAuth } from "@/lib/local/auth";
 import { CategoryIcon } from "./shared";
+import { ModernArtisanChatModal } from "@/components/common/ModernArtisanChatModal";
 
 export function ArtisanCard({
   service,
@@ -16,6 +17,7 @@ export function ArtisanCard({
   showProfileLink?: boolean;
 }) {
   const { user } = useAuth();
+  const [modalOpen, setModalOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [contactUrl, setContactUrl] = useState("");
@@ -133,22 +135,22 @@ export function ArtisanCard({
         {!user ? (
           <Button variant="outline" asChild title="Log in to contact the artisan">
             <Link to="/auth" search={{ redirect: `/listing/${service.id}` }}>
-              <MessageCircle />
+              <span className="tech-artisan-chat-btn-pulse" />
+              <MessageCircle className="size-4" />
               Chat
             </Link>
           </Button>
-        ) : contactUrl ? (
-          <Button variant="outline" asChild>
-            <a href={contactUrl} target="_blank" rel="noopener noreferrer">
-              <MessageCircle />
-              Open chat
-            </a>
-          </Button>
         ) : (
-          <Button variant="outline" disabled={busy} onClick={contact}>
-            <MessageCircle />
-            {busy ? "Loading…" : "Chat"}
-          </Button>
+          <button
+            type="button"
+            className="tech-artisan-chat-btn"
+            onClick={() => setModalOpen(true)}
+            title="Open modern tech artisan chat gateway"
+          >
+            <span className="tech-artisan-chat-btn-pulse" />
+            <MessageCircle className="size-4" />
+            <span>Chat</span>
+          </button>
         )}
       </div>
       {error && (
@@ -156,6 +158,13 @@ export function ArtisanCard({
           {error}
         </p>
       )}
+
+      {/* Modern Tech Artisan Chat & WhatsApp Bridge Modal */}
+      <ModernArtisanChatModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        service={service}
+      />
     </article>
   );
 }

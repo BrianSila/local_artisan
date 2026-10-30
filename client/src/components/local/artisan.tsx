@@ -767,7 +767,10 @@ export function ServicesPage() {
           <div className="form-grid">
             <label>
               Pricing
-              <select value={priceType} onChange={(e) => setPriceType(e.target.value)}>
+              <select
+                value={priceType}
+                onChange={(e) => setPriceType(e.target.value as Service["price_type"])}
+              >
                 <option value="fixed">Fixed price</option>
                 <option value="hourly">Hourly</option>
                 <option value="negotiable">Negotiable</option>
