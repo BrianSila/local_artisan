@@ -160,6 +160,7 @@ textarea:focus-visible {
   outline: 3px solid color-mix(in oklab, var(--primary) 72%, white);
   outline-offset: 2px;
 }
+
 button,
 input,
 select,
@@ -965,6 +966,7 @@ html.light .community-band {
 .marketplace-no-results .empty-state {
   width: 100%;
 }
+
 .listing-meta {
   margin-top: 8px;
 }
@@ -981,6 +983,7 @@ html.light .community-band {
   padding: 8px 10px;
   font-size: 12px;
 }
+
 .listing-bookings-link {
   margin-top: 12px;
 }
@@ -1054,6 +1057,12 @@ html.light .community-band {
   margin-top: 8px;
 }
 .form-section.artisan-form-section {
+
+.onboarding-services-link {
+  margin-top: 8px;
+}
+
+.artisan-form-section {
   margin-top: 24px;
   padding: 26px;
   border: 1px solid var(--border);
@@ -1108,6 +1117,12 @@ textarea {
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+select option {
+  background: var(--card-solid);
+  color: var(--foreground);
 }
 
 input:not([type="file"]):focus-visible,
@@ -1286,6 +1301,7 @@ select:disabled {
   font-size: 12px;
   white-space: nowrap;
 }
+
 .service-card {
   min-width: 0;
   padding: 26px;
@@ -1580,6 +1596,9 @@ select:disabled {
   font-size: 12px;
   font-weight: 500;
   min-height: 40px;
+  font-size: 12.5px;
+  font-weight: 600;
+  height: 38px;
   padding: 0 12px;
 }
 
@@ -1648,6 +1667,7 @@ select:disabled {
   justify-content: space-between;
   gap: 24px;
 }
+
 .public-artisan-identity .section-label {
   margin-bottom: 8px;
 }
@@ -1663,6 +1683,11 @@ select:disabled {
 .public-artisan-identity .artisan-card-verification {
   margin: 0 0 8px;
 }
+
+.public-artisan-action {
+  padding-top: 24px;
+}
+
 .profile-section-heading {
   margin: 36px 0 16px;
   font-family: var(--font-display);
@@ -1697,6 +1722,12 @@ select:disabled {
   color: var(--muted-foreground);
   font-size: 13px;
 }
+
+.public-artisan-stats svg {
+  color: var(--amber-glow);
+}
+
+.public-artisan-stats span,
 .public-artisan-location {
   display: inline-flex;
   align-items: center;
@@ -1738,6 +1769,7 @@ select:disabled {
 .public-artisan-stat-copy {
   white-space: nowrap;
 }
+
 .public-artisan-bio {
   grid-column: 2 / -1;
   max-width: 70ch;
@@ -1827,6 +1859,11 @@ select:disabled {
   color: var(--foreground);
   font-weight: 700;
 }
+
+.public-review-rating svg {
+  color: var(--amber-glow);
+}
+
 .saved-artisan-row {
   display: flex;
   align-items: center;
@@ -1901,6 +1938,7 @@ select:disabled {
   margin-bottom: 0;
   overflow-wrap: anywhere;
 }
+
 .admin-record-heading {
   display: flex;
   align-items: center;
@@ -2244,6 +2282,7 @@ select:disabled {
   background: var(--card);
   box-shadow: var(--shadow-artisan);
 }
+
 .booking-history-row h3,
 .admin-user-row h3 {
   display: flex;
@@ -2301,6 +2340,7 @@ select:disabled {
 .admin-dispute-row > button {
   justify-self: end;
 }
+
 .admin-dispute-row .admin-dispute-summary {
   gap: 16px 28px;
 }
@@ -2409,6 +2449,7 @@ select:disabled {
   color: var(--foreground);
   font-size: 15px;
 }
+
 .booking-action-form {
   margin-top: 22px;
 }
@@ -2539,6 +2580,7 @@ select:disabled {
   font-size: 13px;
   line-height: 1.5;
 }
+
 .dashboard-metric-detail {
   color: var(--muted-foreground);
   font-size: 12px;
@@ -2613,6 +2655,7 @@ select:disabled {
     background-position: -200% 0;
   }
 }
+
 .availability-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
@@ -2727,6 +2770,7 @@ select:disabled {
     background-position: -100% 0;
   }
 }
+
 .about-intro {
   max-width: 780px;
   padding: 20px 0 8px;
