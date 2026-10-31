@@ -1057,6 +1057,8 @@ html.light .community-band {
   margin-top: 8px;
 }
 .form-section.artisan-form-section {
+  @apply flex flex-col gap-4;
+} 
 
 .onboarding-services-link {
   margin-top: 8px;
